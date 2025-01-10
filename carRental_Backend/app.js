@@ -4,9 +4,10 @@ const User = require("./model/userModel");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const connectDB = require("./dbConnection/database");
+const Feedback = require("./model/feedbackModel");
 
 const app = express();
-const port = 5000;
+const port = 3000;
 
 // Connect to MongoDB
 connectDB();
@@ -110,8 +111,141 @@ app.post("/api/signin", async (req, res) => {
     });
   }
 });
+// Get all users route
+app.get("/api/users", async (req, res) => {
+  try {
+    // Check MongoDB connection first
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(500).json({ message: "Database connection error" });
+    }
 
+    // Fetch all users with timeout
+    const users = await User.find().select('-password').maxTimeMS(5000).exec();
+    res.json(users);
+  } catch (error) {
+    console.error("Get users error:", error);
+    res.status(500).json({
+      message: "Error fetching users",
+      error: error.message,
+      details: "Database operation timed out. Please try again.",
+    });
+  }
+});
+
+// Feedback route
+app.post("/api/feedback", async (req, res) => {
+  try {
+    // Check MongoDB connection first
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(500).json({ message: "Database connection error" });
+    }
+
+    const {  message, rating } = req.body;
+
+    // Create new feedback
+    const feedback = new Feedback({
+      
+      message,
+      rating,
+    });
+
+    // Save feedback with timeout using Promise.race
+    const savePromise = feedback.save();
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("Save operation timed out")), 5000);
+    });
+
+    await Promise.race([savePromise, timeoutPromise]);
+    res.status(201).json({ message: "Feedback submitted successfully" });
+  } catch (error) {
+    console.error("Feedback error:", error);
+    res.status(500).json({
+      message: "Error submitting feedback",
+      error: error.message,
+      details: "Database operation timed out. Please try again.",
+    });
+  }
+});
+
+// Get all feedbacks route
+app.get("/api/feedbacks", async (req, res) => {
+  try {
+    // Check MongoDB connection first
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(500).json({ message: "Database connection error" });
+    }
+
+    // Fetch all feedbacks with timeout
+    const feedbacks = await Feedback.find().populate('user', 'name email').maxTimeMS(5000).exec();
+    res.json(feedbacks);
+  } catch (error) {
+    console.error("Get feedbacks error:", error);
+    res.status(500).json({
+      message: "Error fetching feedbacks",
+      error: error.message,
+      details: "Database operation timed out. Please try again.",
+    });
+  }
+});
+    // Save feedback with timeout
+    //show feedbacks from database
 // Start server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+});
+// Add car route
+app.post("/api/cars", async (req, res) => {
+  try {
+    // Check MongoDB connection first
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(500).json({ message: "Database connection error" });
+    }
+
+    const { make, model, year, price } = req.body;
+
+    // Create new car
+    const car = new Car({
+      make,
+      model,
+      year,
+      price,
+    });
+
+    // Save car with timeout using Promise.race
+    const savePromise = car.save();
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("Save operation timed out")), 5000);
+    });
+
+    await Promise.race([savePromise, timeoutPromise]);
+    res.status(201).json({ message: "Car added successfully" });
+  } catch (error) {
+    console.error("Add car error:", error);
+    res.status(500).json({
+      message: "Error adding car",
+      error: error.message,
+      details: "Database operation timed out. Please try again.",
+    });
+  }
+});
+
+// Get all cars route
+app.get("/api/cars", async (req, res) => {
+  try {
+    // Check MongoDB connection first
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(500).json({ message: "Database connection error" });
+    }
+
+    // Fetch all cars with timeout
+    const cars = await Car.find().maxTimeMS(5000).exec();
+    res.json(cars);
+  } catch (error) {
+    console.error("Get cars error:", error);
+    res.status(500).json({
+      message: "Error fetching cars",
+      error: error.message,
+      details: "Database operation timed out. Please try again.",
+    });
+  }
 });

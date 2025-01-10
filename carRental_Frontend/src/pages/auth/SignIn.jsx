@@ -3,40 +3,45 @@ import { api } from '../../services/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '/src/pages/auth/AuthContext'; // Import AuthContext
 import { EyeIcon, EyeOffIcon } from '@heroicons/react/solid';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth(); // Access AuthContext login function
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    if (loading) return; // Prevent duplicate submissions
+
+    setLoading(true); // Start loader
     try {
       const response = await api.post('/signin', { email, password });
-      console.log('Login successful:', response);
+      toast.success('Login successful! Redirecting...');
       
       // Update AuthContext
       login(response.data.user);
 
       // Redirect to home page or dashboard
-      navigate('/');
+      setTimeout(() => navigate('/'), 2000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      toast.error(err.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false); // Stop loader
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-500">
-      <div className="bg-slate-400 p-8 rounded-2xl shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-4">Sign In</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+    <div className="min-h-screen flex items-center justify-center bg-slate-400">
+      <div className="bg-slate-300 p-8 rounded-2xl shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Sign In</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="email">
+            <label className="block text-gray-700 font-medium mb-2" htmlFor="email">
               Email
             </label>
             <input
@@ -44,12 +49,12 @@ const SignIn = () => {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="shadow appearance-none border rounded-2xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="border border-gray-300 rounded-lg w-full py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="password">
+            <label className="block text-gray-700 font-medium mb-2" htmlFor="password">
               Password
             </label>
             <div className="relative">
@@ -58,7 +63,7 @@ const SignIn = () => {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="shadow appearance-none border rounded-2xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="border border-gray-300 rounded-lg w-full py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
               <button
@@ -71,15 +76,25 @@ const SignIn = () => {
               </button>
             </div>
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-4">
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
+              className={`w-full py-2 px-4 text-white font-bold rounded-lg transition ${
+                loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+              } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              disabled={loading}
             >
-              Sign In
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin h-5 w-5 border-4 border-white border-t-transparent rounded-full mr-2"></div>
+                  Signing In...
+                </div>
+              ) : (
+                'Sign In'
+              )}
             </button>
           </div>
-          <p className="mt-4 text-center">
+          <p className="mt-4 text-center text-gray-600">
             Don't have an account?{' '}
             <Link to="/auth/signup" className="text-blue-500 hover:underline">
               Create one
@@ -87,6 +102,12 @@ const SignIn = () => {
           </p>
         </form>
       </div>
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="animate-spin h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+        </div>
+      )}
+      <ToastContainer />
     </div>
   );
 };

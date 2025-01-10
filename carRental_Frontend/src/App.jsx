@@ -8,11 +8,13 @@ import Booking from './pages/home/Booking';
 import Services from './pages/home/Services';
 import SignIn from './pages/auth/SignIn';
 import SignUp from './pages/auth/SignUp';
+import Footer from './components/Footer';
 
 
 function App() {
   const location = useLocation();
   const hideNavbar = location.pathname === "/auth/signin" || location.pathname === "/auth/signup";
+  const hideFooter = location.pathname === "/auth/signin" || location.pathname === "/auth/signup";
 
   return (
     <>
@@ -27,6 +29,7 @@ function App() {
         <Route path="/auth/signin" element={<SignIn />} />
         <Route path="/auth/signup" element={<SignUp />} />
       </Routes>
+      {!hideFooter && <Footer/>}
     </>
   );
 }

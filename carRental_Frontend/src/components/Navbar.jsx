@@ -34,7 +34,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 shadow-lg sticky top-0 z-50">
+    <nav className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 shadow-lg ">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
         <ScrollLink

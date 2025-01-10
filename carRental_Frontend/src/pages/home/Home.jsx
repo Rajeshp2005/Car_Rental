@@ -5,6 +5,7 @@ import Services from './Services';
 import Clients from './Clients';
 import Pricing from './Pricing';
 import Booking from './Booking';
+import Message from './Message';
 
 
 
@@ -18,7 +19,7 @@ const Home = () => {
    <Services/>
    <Clients/>
    <Pricing/>
-   <Booking/>
+   <Message/>
     </div>
   );
 };
