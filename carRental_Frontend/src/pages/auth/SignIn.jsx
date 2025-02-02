@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { api } from '../../services/api';
+import api  from '../../services/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '/src/pages/auth/AuthContext'; // Import AuthContext
 import { EyeIcon, EyeOffIcon } from '@heroicons/react/solid';
@@ -16,22 +16,32 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return; // Prevent duplicate submissions
-
-    setLoading(true); // Start loader
+    setLoading(true);
     try {
-      const response = await api.post('/signin', { email, password });
-      toast.success('Login successful! Redirecting...');
+      const response = await api.post('/users/signin', { email, password });
       
-      // Update AuthContext
-      login(response.data.user);
+      if (response.data.user && response.data.token) {
+        // Store token
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Update auth context
+        login({
+          ...response.data.user,
+          token: response.data.token
+        });
 
-      // Redirect to home page or dashboard
-      setTimeout(() => navigate('/'), 2000);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed. Please check your credentials.');
+        // Success notification
+        toast.success('Successfully logged in!');
+        
+        // Immediate navigation
+        navigate('/userhome');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error(error.response?.data?.message || 'Login failed');
     } finally {
-      setLoading(false); // Stop loader
+      setLoading(false);
     }
   };
 

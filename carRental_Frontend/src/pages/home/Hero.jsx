@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import "aos/dist/aos.css";
 import AOS from "aos";
 import { Link } from "react-scroll"; // Importing Link component from react-scroll
-import FixedCar from "./FixedCar";
+
 
 const Hero = () => {
   useEffect(() => {
@@ -12,7 +12,7 @@ const Hero = () => {
   return (
     <div>
       {/* Hero Section */}
-     <FixedCar />
+     
       <div className="bg-neutral-900 relative overflow-hidden" id="home">
         <div className="max-w-7xl mx-auto px-4 xl:px-0 pt-24 lg:pt-32 pb-24">
           <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-12">

@@ -4,8 +4,8 @@ import About from './About';
 import Services from './Services';
 import Clients from './Clients';
 import Pricing from './Pricing';
-import Booking from './Booking';
 import Message from './Message';
+import Cars from './Cars';
 
 
 
@@ -17,6 +17,7 @@ const Home = () => {
    <Hero/>
    <About/>
    <Services/>
+   <Cars/>
    <Clients/>
    <Pricing/>
    <Message/>

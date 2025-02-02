@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { api } from '../../services/api';
+import api  from '../../services/api';
 import { Link, useNavigate } from 'react-router-dom';
 import PasswordInput from './PasswordInput'; // Import reusable component
 import { ToastContainer, toast } from 'react-toastify';
@@ -24,7 +24,7 @@ const SignUp = () => {
 
     setLoading(true); // Start loader
     try {
-      const response = await api.post('/signup', { name, email, password });
+      const response = await api.post('/users/signup', { name, email, password });
       toast.success('Signup successful! Redirecting...');
       setTimeout(() => {
         navigate('/auth/signin'); // Redirect to sign-in page on success
